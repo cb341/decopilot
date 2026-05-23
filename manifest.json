@@ -1,0 +1,25 @@
+{
+  "manifest_version": 3,
+  "name": "Decopilot",
+  "version": "0.1.0",
+  "description": "Removes GitHub Copilot UI from github.com.",
+  "content_scripts": [
+    {
+      "matches": [
+        "*://github.com/*"
+      ],
+      "css": [
+        "content.css"
+      ],
+      "js": [
+        "content.js"
+      ],
+      "run_at": "document_start"
+    }
+  ],
+  "browser_specific_settings": {
+    "gecko": {
+      "id": "decopilot@example.local"
+    }
+  }
+}

@@ -1,0 +1,42 @@
+.octicon-copilot,
+.js-copilot-avatar,
+[data-hovercard-type="copilot"],
+[aria-label*="Copilot"],
+[aria-label*="copilot"],
+[aria-label*="AI Pair Programmer"],
+[aria-label*="Pair Programmer"],
+[title*="Copilot"],
+[title*="copilot"],
+[title*="AI Pair Programmer"],
+[title*="Pair Programmer"],
+[id*="copilot"],
+[data-testid*="copilot"],
+[class*="CopilotItems-module__"],
+[class*="copilot"],
+a[href^="/copilot"],
+a[href*="/apps/copilot"],
+a[href^="https://github.com/copilot"],
+a[href*="github.com/apps/copilot"] {
+  display: none !important;
+}
+
+div.tmp-py-2.tmp-px-3.border.bgColor-muted.rounded-2.mt-2.Stack,
+div.tmp-py-2.tmp-px-3.border.bgColor-muted.rounded-2.mt-2.Stack[data-view-component="true"] {
+  display: none !important;
+}
+
+button:has(.octicon-copilot),
+a:has(.octicon-copilot),
+div:has(> .octicon-copilot),
+div:has(.js-copilot-avatar),
+div:has(> .StackItem > .octicon-copilot),
+div:has(> .StackItem .octicon-copilot),
+details:has([data-hovercard-type="copilot"]),
+li:has(.octicon-copilot),
+li:has([data-hovercard-type="copilot"]),
+nav :has(> .octicon-copilot),
+[class*="CopilotItems-module__Wrapper__"],
+[class*="CopilotItems-module__CopilotMenu__"],
+[class*="CopilotItems-module__AgentsMenu__"] {
+  display: none !important;
+}
