@@ -16,9 +16,7 @@ const TEXT_PATTERNS = [
   /mention\s+@copilot\s+in\s+a\s+comment/i,
   /request\s+review\s+from\s+copilot/i,
   /your\s+ai\s+pair\s+programmer/i,
-  /ai\s+pair\s+programmer/i,
-  /\bcopilot\b/i,
-  /@copilot/i
+  /ai\s+pair\s+programmer/i
 ];
 
 const CONTAINER_SELECTORS = [
@@ -33,6 +31,26 @@ const CONTAINER_SELECTORS = [
   'span',
   'p',
   'label'
+];
+
+const UI_ROOT_SELECTORS = [
+  'header',
+  'nav',
+  'aside',
+  'details',
+  'details-menu',
+  'tool-tip',
+  '[role="tooltip"]',
+  '[role="menu"]',
+  '[role="menuitem"]',
+  '[role="menuitemcheckbox"]',
+  '[role="dialog"]',
+  '[popover]',
+  '[data-testid="top-bar-actions"]',
+  '[data-testid="top-nav-right"]',
+  '.discussion-sidebar',
+  '.js-discussion-sidebar',
+  '.TimelineItem'
 ];
 
 function scoreElement(element) {
@@ -59,6 +77,10 @@ function scoreElement(element) {
 
 function matchesCopilotText(value) {
   return TEXT_PATTERNS.some((pattern) => pattern.test(value));
+}
+
+function isUiContext(element) {
+  return Boolean(element.closest(UI_ROOT_SELECTORS.join(',')));
 }
 
 function isEmptyCopilotShell(element) {
@@ -90,7 +112,8 @@ function findRemovableRoot(element) {
 
     if (
       current.matches(CONTAINER_SELECTORS.join(',')) &&
-      scoreElement(current) >= 4
+      scoreElement(current) >= 4 &&
+      isUiContext(current)
     ) {
       return current;
     }
@@ -116,7 +139,7 @@ function findTextBasedRoot(element) {
       continue;
     }
 
-    if (matchesCopilotText(text) && text.length <= 400) {
+    if (matchesCopilotText(text) && text.length <= 400 && isUiContext(current)) {
       return current;
     }
 
@@ -151,6 +174,7 @@ function removeCopilot(root = document) {
     const title = element.getAttribute('title') || '';
 
     if (
+      !isUiContext(element) ||
       !matchesCopilotText(ownText) &&
       !matchesCopilotText(ariaLabel) &&
       !matchesCopilotText(title)
