@@ -8,6 +8,12 @@ const SELECTORS = [
   '.octicon-copilot',
   '[aria-label*="Copilot"]',
   '[aria-label*="copilot"]',
+  '[class*="Copilot"]',
+  '[class*="copilot"]',
+  'react-partial[partial-name="new-agent-task-button"]',
+  'a[data-tab-item="agents"]',
+  'a[href*="/agents?author="]',
+  'a[href$="/agents"]',
   '[id*="copilot"]',
   '[data-testid*="copilot"]'
 ];
@@ -52,6 +58,8 @@ const UI_ROOT_SELECTORS = [
   '.js-discussion-sidebar',
   '.TimelineItem'
 ];
+
+const COPILOT_SECTION_TITLE_SELECTORS = '.QueryBuilder-sectionTitle, .ActionList-sectionDivider-title';
 
 function scoreElement(element) {
   const text = (element.textContent || '').trim();
@@ -124,6 +132,62 @@ function findRemovableRoot(element) {
   return element instanceof HTMLElement ? element : null;
 }
 
+function removeCopilotSectionTitles(root = document) {
+  const titles = [];
+
+  if (root instanceof Element && root.matches(COPILOT_SECTION_TITLE_SELECTORS)) {
+    titles.push(root);
+  }
+
+  if (root instanceof Element) {
+    titles.push(...root.querySelectorAll(COPILOT_SECTION_TITLE_SELECTORS));
+  }
+
+  for (const title of titles) {
+    const text = (title.textContent || '').replace(/\s+/g, ' ').trim();
+
+    if (text.toLowerCase() === 'copilot') {
+      const section =
+        title.closest('li.ActionList-sectionDivider') ||
+        title.closest('li[role="presentation"]') ||
+        title.parentElement;
+
+      if (section && section.isConnected) {
+        section.remove();
+      }
+    }
+  }
+}
+
+function removeCopilotAuthorFilterOptions(root = document) {
+  const candidates = [];
+
+  if (root instanceof Element && root.matches('a.SelectMenu-item')) {
+    candidates.push(root);
+  }
+
+  if (root instanceof Element) {
+    candidates.push(...root.querySelectorAll('a.SelectMenu-item'));
+  }
+
+  for (const item of candidates) {
+    const href = item.getAttribute('href') || '';
+    const text = (item.textContent || '').replace(/\s+/g, ' ').trim();
+    const isAuthorFilter = Boolean(
+      item.closest('[data-filter="author"]') ||
+      item.closest('[data-filterable-for="author-filter-field"]') ||
+      item.closest('div.select-menu-list')
+    );
+
+    if (
+      isAuthorFilter &&
+      (/author:%40copilot/i.test(href) || /copilot/i.test(text))
+    ) {
+      item.remove();
+    }
+  }
+}
+
 function findTextBasedRoot(element) {
   let current = element;
 
@@ -150,6 +214,9 @@ function findTextBasedRoot(element) {
 }
 
 function removeCopilot(root = document) {
+  removeCopilotSectionTitles(root);
+  removeCopilotAuthorFilterOptions(root);
+
   const matches = root.querySelectorAll(SELECTORS.join(','));
 
   for (const match of matches) {
